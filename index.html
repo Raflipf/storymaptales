@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="StoryMapTales - Share your stories with location on interactive maps"
+    />
+    <meta name="theme-color" content="#4F46E5" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="StoryMapTales" />
+
+    <title>StoryMapTales</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+      integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+      crossorigin=""
+    />
+    <script
+      src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+      integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+      crossorigin=""
+    ></script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#4F46E5",
+              "primary-dark": "#4338CA",
+              secondary: "#10B981",
+              "secondary-dark": "#059669",
+              accent: "#F97316",
+              "accent-dark": "#EA580C",
+            },
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      .skip-link {
+        position: absolute;
+        top: -40px;
+        left: 0;
+        padding: 8px;
+        background-color: #4f46e5;
+        color: white;
+        z-index: 100;
+        transition: top 0.3s;
+      }
+
+      .skip-link:focus {
+        top: 0;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .fadein {
+        animation: fadeIn 0.5s ease-in-out;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 font-sans min-h-screen flex flex-col">
+    <a href="#main-content" class="skip-link">Skip to content</a>
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+      <div class="container mx-auto px-4 py-3">
+        <div class="flex justify-between items-center">
+          <a href="#/" class="flex items-center space-x-2">
+            <i class="fas fa-map-marked-alt text-2xl text-primary"></i>
+            <span class="font-bold text-xl">StoryMapTales</span>
+          </a>
+
+          <nav class="flex items-center">
+            <div id="main-nav" class="hidden md:flex space-x-6 mr-8">
+              <a href="#/" class="text-gray-700 hover:text-primary">Home</a>
+              <a href="#/map" class="text-gray-700 hover:text-primary"
+                >Map View</a
+              >
+              <a href="#/add" class="text-gray-700 hover:text-primary"
+                >Add Story</a
+              >
+              <a
+                href="#/offline-stories"
+                class="text-gray-700 hover:text-primary"
+              >
+                <i class="fas fa-book-reader mr-1"></i>Offline Stories
+              </a>
+            </div>
+
+            <div id="auth-desktop" class="flex items-center space-x-2">
+              <a href="#/login" class="text-primary hover:text-primary-dark"
+                >Login</a
+              >
+              <a
+                href="#/register"
+                class="ml-4 bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md"
+                >Register</a
+              >
+            </div>
+
+            <div id="user-desktop" class="hidden flex items-center">
+              <span class="text-gray-700 mr-4" id="user-name-display"></span>
+              <button
+                id="logout-desktop"
+                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md"
+              >
+                <i class="fas fa-sign-out-alt mr-1"></i> Logout
+              </button>
+            </div>
+
+            <button
+              id="mobile-menu-button"
+              class="md:hidden ml-4 text-gray-700 hover:text-primary focus:outline-none"
+            >
+              <i class="fas fa-bars"></i>
+            </button>
+          </nav>
+        </div>
+
+        <div id="mobile-menu" class="hidden md:hidden py-4 border-t mt-3">
+          <a href="#/" class="block py-2 text-gray-700 hover:text-primary"
+            >Home</a
+          >
+          <a href="#/map" class="block py-2 text-gray-700 hover:text-primary"
+            >Map View</a
+          >
+          <a href="#/add" class="block py-2 text-gray-700 hover:text-primary"
+            >Add Story</a
+          >
+          <a
+            href="#/offline-stories"
+            class="block py-2 text-gray-700 hover:text-primary"
+          >
+            <i class="fas fa-book-reader mr-1"></i>Offline Stories
+          </a>
+
+          <div id="auth-mobile" class="mt-4 pt-4 border-t">
+            <a
+              href="#/login"
+              class="block py-2 text-primary hover:text-primary-dark"
+              >Login</a
+            >
+            <a
+              href="#/register"
+              class="block py-2 text-primary hover:text-primary-dark"
+              >Register</a
+            >
+          </div>
+
+          <div id="user-mobile" class="hidden mt-4 pt-4 border-t">
+            <div class="text-gray-700 py-2" id="user-name-mobile"></div>
+            <button
+              id="logout-mobile"
+              class="text-red-500 hover:text-red-600 py-2 flex items-center"
+            >
+              <i class="fas fa-sign-out-alt mr-2"></i> Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main id="main-content" class="container mx-auto px-4 py-8 flex-grow">
+      <div class="animate-pulse">
+        <div class="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="bg-white rounded-lg shadow-md p-4 h-72"></div>
+          <div class="bg-white rounded-lg shadow-md p-4 h-72"></div>
+          <div class="bg-white rounded-lg shadow-md p-4 h-72"></div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8">
+      <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div>
+            <h3 class="text-xl font-bold mb-4">StoryMapTales</h3>
+            <p class="text-gray-300">
+              Share your stories on interactive maps. Capture memories with
+              location and photos.
+            </p>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-bold mb-4">Navigation</h3>
+            <ul class="space-y-2">
+              <li>
+                <a href="#/" class="text-gray-300 hover:text-white">Home</a>
+              </li>
+              <li>
+                <a href="#/map" class="text-gray-300 hover:text-white"
+                  >Map View</a
+                >
+              </li>
+              <li>
+                <a href="#/add" class="text-gray-300 hover:text-white"
+                  >Add Story</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#/offline-stories"
+                  class="text-gray-300 hover:text-white"
+                >
+                  <i class="fas fa-book-reader mr-1"></i>Offline Stories
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-bold mb-4">Contact</h3>
+            <p class="text-gray-300">Have questions or feedback?</p>
+            <p class="text-gray-300 mt-2">Email: info@storymaptales.com</p>
+          </div>
+        </div>
+
+        <div
+          class="mt-8 pt-6 border-t border-gray-700 text-center text-gray-400"
+        >
+          <p>&copy; 2023 StoryMapTales. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <div
+      id="notification-container"
+      class="fixed top-6 right-6 z-50 flex flex-col gap-2 transition-all duration-300 w-80"
+    >
+      <!-- Notifications will be inserted here by JavaScript -->
+    </div>
+
+    <style>
+      .notification-item {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: opacity 0.3s ease-in-out;
+        border-left-width: 4px;
+        animation: slideIn 0.3s forwards;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+    </style>
+
+    <!-- Scripts -->
+    <script src="./src/scripts/index.js" type="module"></script>
+
+    <script>
+      // Mobile menu toggle
+      document
+        .getElementById("mobile-menu-button")
+        .addEventListener("click", function () {
+          const mobileMenu = document.getElementById("mobile-menu");
+          mobileMenu.classList.toggle("hidden");
+        });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,35 @@
+{
+  "name": "StoryMapTales",
+  "short_name": "StoryMapTales",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#4F46E5",
+  "theme_color": "#4F46E5",
+  "description": "Share your stories on interactive maps. Capture memories with location and photos.",
+  "icons": [
+    {
+      "src": "assets/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "assets/screenshots/screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png"
+    },
+    {
+      "src": "/screenshots/screenshot-portrait.png",
+      "sizes": "720x1280",
+      "type": "image/png"
+    }
+  ]
+}
